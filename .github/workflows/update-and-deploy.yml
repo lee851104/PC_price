@@ -36,7 +36,8 @@ jobs:
       - run: npm ci
       - name: 查詢本月價格
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: npm run update-prices
       - name: 檢查資料格式
         run: npm run validate

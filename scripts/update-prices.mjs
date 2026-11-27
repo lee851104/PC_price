@@ -1,17 +1,17 @@
-// 每月更新零件價格：用 Claude + 網路搜尋查本月價格，驗證後寫回 data/prices.json。
+// 每月更新零件價格：用 OpenAI + 網路搜尋查本月價格，驗證後寫回 data/prices.json。
 // 用法：
 //   node scripts/update-prices.mjs              查所有有 track 設定的零件並寫檔
 //   node scripts/update-prices.mjs --dry-run    只查不寫
 //   node scripts/update-prices.mjs --only=ram   只查某個零件
-// 需要環境變數 ANTHROPIC_API_KEY。
+// 需要環境變數 OPENAI_API_KEY；可用 OPENAI_MODEL 換模型。
 
 import fs from "node:fs";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { z } from "zod";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { zodTextFormat } from "openai/helpers/zod";
 
 const FILE = new URL("../data/prices.json", import.meta.url);
-const MODEL = "claude-opus-5-5";
+const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 const DRY = process.argv.includes("--dry-run");
 const ONLY = process.argv.find((a) => a.startsWith("--only="))?.slice(7);
 
@@ -20,7 +20,7 @@ const twNow = new Date(Date.now() + 8 * 3600 * 1000);
 const TODAY = twNow.toISOString().slice(0, 10);
 const MONTH = TODAY.slice(0, 7);
 
-const client = new Anthropic();
+const client = new OpenAI();
 
 const Result = z.object({
   found: z.boolean(),
@@ -41,6 +41,17 @@ const normUrl = (u) => {
   }
 };
 
+// 存檔前拿掉 utm_ 追蹤參數（OpenAI 引用網址會加上 utm_source=openai）
+const cleanUrl = (u) => {
+  try {
+    const x = new URL(u);
+    for (const k of [...x.searchParams.keys()]) if (k.startsWith("utm_")) x.searchParams.delete(k);
+    return x.toString();
+  } catch {
+    return u;
+  }
+};
+
 async function research(part) {
   const currency = part.cur === "TWD" ? "新台幣（TWD）" : "美元（USD）";
   const last = part.pts[part.pts.length - 1];
@@ -58,44 +69,38 @@ ${part.track.query}
 - 如果查不到最近 30 天的可靠價格，就明白說查不到，不要拿舊資料或推測值充數。
 - 最後用一小段話總結：價格、日期、產品名稱、來源 URL。`;
 
-  let messages = [{ role: "user", content: prompt }];
-  let resp;
-  for (let i = 0; i < 5; i++) {
-    resp = await client.beta.messages.create({
-      model: MODEL,
-      max_tokens: 16000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      output_config: { effort: "medium" },
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 6 }],
-      messages,
-    });
-    if (resp.stop_reason !== "pause_turn") break;
-    messages = [messages[0], { role: "assistant", content: resp.content }];
-  }
-  if (resp.stop_reason === "refusal") throw new Error("模型拒絕回答：" + (resp.stop_details?.category ?? "unknown"));
+  const resp = await client.responses.create({
+    model: MODEL,
+    reasoning: { effort: "medium" },
+    tools: [{ type: "web_search" }],
+    include: ["web_search_call.action.sources"],
+    input: prompt,
+  });
 
   // 收集搜尋實際回傳過的網址，用來確認來源不是編出來的
   const urls = new Set();
-  let text = "";
-  for (const block of resp.content) {
-    if (block.type === "web_search_tool_result" && Array.isArray(block.content)) {
-      for (const r of block.content) if (r.url) urls.add(normUrl(r.url));
+  for (const item of resp.output) {
+    if (item.type === "web_search_call") {
+      const a = item.action;
+      for (const s of a?.sources ?? []) if (s.url) urls.add(normUrl(s.url));
+      if (a?.url) urls.add(normUrl(a.url));
     }
-    if (block.type === "text") {
-      text += block.text;
-      for (const c of block.citations ?? []) if (c.url) urls.add(normUrl(c.url));
+    if (item.type === "message") {
+      for (const c of item.content) {
+        for (const ann of c.annotations ?? []) if (ann.type === "url_citation") urls.add(normUrl(ann.url));
+      }
     }
   }
+  const text = resp.output_text;
   return { text, urls };
 }
 
 async function extract(part, notes) {
-  const resp = await client.messages.parse({
+  const resp = await client.responses.parse({
     model: MODEL,
-    max_tokens: 4000,
-    output_config: { effort: "low", format: zodOutputFormat(Result) },
-    messages: [
+    reasoning: { effort: "low" },
+    text: { format: zodTextFormat(Result, "price_result") },
+    input: [
       {
         role: "user",
         content: `以下是查價筆記。請整理成指定欄位。
@@ -112,8 +117,8 @@ ${notes}
       },
     ],
   });
-  if (!resp.parsed_output) throw new Error("無法解析查價結果");
-  return resp.parsed_output;
+  if (!resp.output_parsed) throw new Error("無法解析查價結果");
+  return resp.output_parsed;
 }
 
 function validate(part, r, urls) {
@@ -151,14 +156,14 @@ for (const [m, machine] of Object.entries(db.machines)) {
         continue;
       }
       const key = `auto-${id}-${MONTH}`;
-      db.sources[key] = { title: r.source_title, url: r.source_url };
+      db.sources[key] = { title: r.source_title, url: cleanUrl(r.source_url) };
       part.pts.push({ date: MONTH, value: Math.round(r.price * 100) / 100, note: `${part.track.note}：${r.product}`, source: key });
       part.src = [...new Set([...(part.src ?? []), key])];
       changed++;
       report.push([label, "已更新", `${r.price} ${part.cur}（${r.observed_date}）${r.source_url}`]);
     } catch (e) {
-      if (e instanceof Anthropic.AuthenticationError) throw new Error("ANTHROPIC_API_KEY 無效或沒有設定");
-      report.push([label, "錯誤", e instanceof Anthropic.APIError ? `API ${e.status}：${e.message}` : String(e.message ?? e)]);
+      if (e instanceof OpenAI.AuthenticationError) throw new Error("OPENAI_API_KEY 無效或沒有設定");
+      report.push([label, "錯誤", e instanceof OpenAI.APIError ? `API ${e.status}：${e.message}` : String(e.message ?? e)]);
     }
   }
 }
