@@ -1,0 +1,78 @@
+name: 更新價格並部署
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 每月 1 日 01:00 UTC（台灣時間 09:00）
+    - cron: "0 1 1 * *"
+  workflow_dispatch:
+    inputs:
+      update_prices:
+        description: "這次要查新價格嗎？"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    # push 只部署，排程或手動執行（勾選查價）才查新價格
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.update_prices)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 查詢本月價格
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npm run update-prices
+      - name: 檢查資料格式
+        run: npm run validate
+      - name: 提交更新
+        run: |
+          if git diff --quiet -- data/prices.json; then
+            echo "資料沒有變動"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          git commit -m "每月價格更新 $(TZ=Asia/Taipei date +%Y-%m)"
+          git push
+
+  deploy:
+    needs: update
+    if: always() && (needs.update.result == 'success' || needs.update.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: 檢查資料格式
+        run: node scripts/validate-data.mjs
+      - name: 準備網站檔案
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r data _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

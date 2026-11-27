@@ -1,0 +1,576 @@
+{
+  "checked": "2026-11-27",
+  "sources": {
+    "engadget": {
+      "title": "Engadget：2020 與 2026 記憶體價格比較",
+      "url": "https://www.engadget.com/2300341/how-much-ram-cost-2020-vs-2026/"
+    },
+    "slick21": {
+      "title": "Slickdeals：Crucial 32GB DDR4 $102（2021/11）",
+      "url": "https://slickdeals.net/f/15462790-crucial-32gb-2x-16gb-ddr4-3200-mts-ram-102"
+    },
+    "camelDdr4": {
+      "title": "camelcamelcamel：Crucial 32GB DDR4 價格紀錄",
+      "url": "https://camelcamelcamel.com/product/B08C4LXXCJ"
+    },
+    "camelDdr5": {
+      "title": "camelcamelcamel：Crucial 32GB DDR5-6000 價格紀錄",
+      "url": "https://camelcamelcamel.com/product/B0CT9BMGLF"
+    },
+    "toms375": {
+      "title": "Tom's Hardware：32GB DDR5 最低 $375",
+      "url": "https://www.tomshardware.com/pc-components/ddr5/32gb-of-ddr5-now-costs-usd375-minimum-ai-shortage-continues-to-squeeze-pc-building"
+    },
+    "ramIdx": {
+      "title": "Tom's Hardware：RAM 價格指數 2026",
+      "url": "https://tomshardware.com/pc-components/ram/ram-price-index-2026-lowest-price-on-ddr5-and-ddr4-memory-of-all-capacities"
+    },
+    "ti450": {
+      "title": "Tech Insider：DDR5 32GB $449.97 → $438",
+      "url": "https://tech-insider.org/ddr5-ram-price-450-ai-shortage-2026/"
+    },
+    "wikiRtx30": {
+      "title": "Wikipedia：GeForce RTX 30 series",
+      "url": "https://en.wikipedia.org/wiki/GeForce_RTX_30_series"
+    },
+    "toms2109": {
+      "title": "Tom's Hardware：eBay 顯卡價格（2021/9）",
+      "url": "https://www.tomshardware.com/news/gpus-historical-ebay-pricing/26"
+    },
+    "ts2112": {
+      "title": "TechSpot：GPU 價格更新 2021/12",
+      "url": "https://www.techspot.com/article/2389-gpu-pricing-2021-update/"
+    },
+    "ts2202": {
+      "title": "TechSpot：GPU 價格更新 2022/2",
+      "url": "https://www.techspot.com/article/2418-gpu-pricing-2022-update/"
+    },
+    "toms2208": {
+      "title": "Tom's Hardware：eBay 顯卡價格（2022/8）",
+      "url": "https://www.tomshardware.com/news/gpus-historical-ebay-pricing/15"
+    },
+    "toms2210": {
+      "title": "Tom's Hardware：eBay 顯卡價格（2022/10）",
+      "url": "https://www.tomshardware.com/news/gpus-historical-ebay-pricing/13"
+    },
+    "toms4070": {
+      "title": "Tom's Hardware：RTX 4070 上市回到建議售價",
+      "url": "https://www.tomshardware.com/news/rtx-4070-walked-back-to-msrp-after-launch"
+    },
+    "tt4070": {
+      "title": "TweakTown：RTX 4070 美國降到 $549",
+      "url": "https://www.tweaktown.com/news/93299/nvidia-geforce-rtx-4070-gpus-have-seen-their-price-drop-in-the-us-to-549/index.html"
+    },
+    "tr4070": {
+      "title": "TechRadar：RTX 4070 降到 $530",
+      "url": "https://techradar.com/computing/gpu/looking-to-buy-an-rtx-4070-super-good-news-nvidias-new-gpu-has-already-dropped-below-msrp"
+    },
+    "tsq3": {
+      "title": "TechSpot：GPU 價格 2026 Q3",
+      "url": "https://www.techspot.com/article/3167-gpu-pricing-q3-2026/"
+    },
+    "tsq4": {
+      "title": "TechSpot：GPU 價格 2026 Q4",
+      "url": "https://www.techspot.com/article/3192-gpu-pricing-q4-2026/"
+    },
+    "pangoly": {
+      "title": "Pangoly：Ryzen 7 7800X3D 價格紀錄",
+      "url": "https://pangoly.com/en/price-history/amd-ryzen-7-7800x3d"
+    },
+    "camel7800": {
+      "title": "camelcamelcamel：Ryzen 7 7800X3D 價格紀錄",
+      "url": "https://camelcamelcamel.com/product/B0BTZB7F88"
+    },
+    "sdpCheap": {
+      "title": "StorageDiskPrices：便宜 SSD 去哪了",
+      "url": "https://storagediskprices.com/what-happened-cheap-ssds/"
+    },
+    "sdpHist": {
+      "title": "StorageDiskPrices：SSD 價格歷史",
+      "url": "https://storagediskprices.com/ssd-price-history/"
+    },
+    "tiSsd": {
+      "title": "Tech Insider：NAND 短缺讓 SSD 漲價",
+      "url": "https://tech-insider.org/ssd-prices-nand-shortage-2026/"
+    },
+    "insideM1": {
+      "title": "INSIDE：M1 MacBook Air 台灣上架",
+      "url": "https://www.inside.com.tw/article/22029-M1-launch-apple-shelf"
+    },
+    "tbM2": {
+      "title": "T 客邦：M2 MacBook Air 預購價格",
+      "url": "https://www.techbang.com/posts/98410-the-m2-version-of-macbook-air-is-open-for-pre-order-priced-at"
+    },
+    "yahooM4": {
+      "title": "Yahoo 新聞：M4 MacBook Air NT$34,900 起（含 M3 價格）",
+      "url": "https://tw.news.yahoo.com/m4-macbook-air-tw-price-nt34900-up-053728422.html"
+    },
+    "tnM5": {
+      "title": "科技新報：M5 MacBook Air 發表",
+      "url": "https://technews.tw/2026/03/03/m5-macbook-air/"
+    },
+    "madM5": {
+      "title": "瘋先生：M5 MacBook Air 台灣售價",
+      "url": "https://mrmad.com.tw/macbook-air-m5-2026-features"
+    },
+    "afHike": {
+      "title": "蘋果迷：2026 Mac 漲價後售價",
+      "url": "https://applefans.today/2026-06-mac-ipad-apple-price-increase/"
+    },
+    "tnHike": {
+      "title": "科技新報：MacBook、iPad 台灣售價調漲",
+      "url": "https://technews.tw/2026/06/26/price-increases-for-macbook-and-ipad-in-taiwan/"
+    },
+    "madHike": {
+      "title": "瘋先生：蘋果漲價漲幅對照表",
+      "url": "https://mrmad.com.tw/2026-apple-price-hike-macbook-ipad"
+    }
+  },
+  "machines": {
+    "win": {
+      "label": "側板拆開・桌上型主機",
+      "parts": {
+        "cpu": {
+          "name": "CPU 處理器",
+          "spec": "追蹤型號：AMD Ryzen 7 7800X3D（2023 年上市）",
+          "cur": "USD",
+          "unit": "美元・美國零售／二手均價",
+          "quality": "中",
+          "pts": [
+            {
+              "date": "2024-06",
+              "value": 334.99,
+              "note": "有紀錄以來最低價"
+            },
+            {
+              "date": "2025-10",
+              "value": 319.99,
+              "note": "Amazon 歷史低價"
+            },
+            {
+              "date": "2026-04",
+              "value": 689.18,
+              "note": "單一通路最高紀錄，缺貨時的價格"
+            },
+            {
+              "date": "2026-11",
+              "value": 339,
+              "note": "目前價格"
+            }
+          ],
+          "src": [
+            "pangoly",
+            "camel7800"
+          ],
+          "notes": [
+            "7800X3D 在 2023 年才上市，所以沒有更早的資料。",
+            "CPU 不像記憶體受 AI 需求直接衝擊，價格大致穩在 $320–$350。",
+            "2026 年 4 月的高點是個別通路缺貨時的價格，不代表整體行情。"
+          ],
+          "track": {
+            "query": "AMD Ryzen 7 7800X3D 在美國主要零售通路（Amazon、Newegg、Best Buy）本月的最低新品售價（美元）",
+            "note": "本月最低售價"
+          }
+        },
+        "gpu": {
+          "name": "顯示卡",
+          "spec": "追蹤 xx70 等級：RTX 3070 → 4070 → 5070，依世代接續",
+          "cur": "USD",
+          "unit": "美元・美國零售／二手均價",
+          "quality": "中",
+          "pts": [
+            {
+              "date": "2020-10",
+              "value": 499,
+              "note": "RTX 3070 建議售價"
+            },
+            {
+              "date": "2021-09",
+              "value": 1210,
+              "note": "RTX 3070 eBay 均價，挖礦潮"
+            },
+            {
+              "date": "2021-12",
+              "value": 1099,
+              "note": "RTX 3070 eBay 均價"
+            },
+            {
+              "date": "2022-02",
+              "value": 1030,
+              "note": "RTX 3070 eBay 均價"
+            },
+            {
+              "date": "2022-08",
+              "value": 463,
+              "note": "RTX 3070 eBay 均價，礦潮退燒"
+            },
+            {
+              "date": "2022-10",
+              "value": 376,
+              "note": "RTX 3070 eBay 均價"
+            },
+            {
+              "date": "2023-04",
+              "value": 599,
+              "note": "RTX 4070 建議售價"
+            },
+            {
+              "date": "2023-09",
+              "value": 549,
+              "note": "RTX 4070 美國通路降價"
+            },
+            {
+              "date": "2024-02",
+              "value": 530,
+              "note": "RTX 4070 Super 上市後"
+            },
+            {
+              "date": "2025-03",
+              "value": 549,
+              "note": "RTX 5070 建議售價"
+            },
+            {
+              "date": "2026-08",
+              "value": 802,
+              "note": "RTX 5070 美國行情，高於建議價 46%"
+            },
+            {
+              "date": "2026-11",
+              "value": 900,
+              "note": "RTX 5070 美國行情，高於建議價 64%"
+            }
+          ],
+          "events": [
+            [
+              "2021-09",
+              "挖礦潮"
+            ],
+            [
+              "2022-09",
+              "以太坊改 PoS"
+            ],
+            [
+              "2025-11",
+              "GDDR7 缺貨"
+            ]
+          ],
+          "src": [
+            "wikiRtx30",
+            "toms2109",
+            "ts2112",
+            "ts2202",
+            "toms2208",
+            "toms2210",
+            "toms4070",
+            "tt4070",
+            "tr4070",
+            "tsq3",
+            "tsq4"
+          ],
+          "notes": [
+            "2021 年的數字是 eBay 成交均價，當時新卡幾乎買不到原價，實際成交價是建議售價的兩倍以上。",
+            "2022 年 9 月以太坊停止挖礦後，礦卡大量釋出，價格快速崩跌。",
+            "2026 年 GDDR7 顯示記憶體短缺，板卡廠多次調漲，RTX 5070 美國售價來到約 $900。"
+          ],
+          "track": {
+            "query": "NVIDIA GeForce RTX 5070 在美國零售通路本月的最低或典型新品售價（美元），可參考 TechSpot、Tom's Hardware 的 GPU 價格追蹤",
+            "note": "RTX 5070 本月美國行情"
+          }
+        },
+        "ram": {
+          "name": "記憶體",
+          "spec": "32GB（2×16GB）桌機記憶體最低售價；2023 年前為 DDR4，之後為 DDR5-6000",
+          "cur": "USD",
+          "unit": "美元・美國零售／二手均價",
+          "quality": "中",
+          "pts": [
+            {
+              "date": "2020-11",
+              "value": 94.99,
+              "note": "DDR4-3200 促銷價"
+            },
+            {
+              "date": "2021-11",
+              "value": 102,
+              "note": "DDR4-3200，Cyber Monday"
+            },
+            {
+              "date": "2023-08",
+              "value": 45.99,
+              "note": "DDR4 歷史最低價"
+            },
+            {
+              "date": "2025-03",
+              "value": 73.5,
+              "note": "DDR5-6000 歷史低價"
+            },
+            {
+              "date": "2026-06",
+              "value": 374.97,
+              "note": "DDR5，美國最便宜的 32GB 套條"
+            },
+            {
+              "date": "2026-10",
+              "value": 449.97,
+              "note": "DDR5-6000 最低價"
+            },
+            {
+              "date": "2026-11",
+              "value": 438,
+              "note": "DDR5-6000 最低價"
+            }
+          ],
+          "events": [
+            [
+              "2023-08",
+              "DRAM 谷底"
+            ],
+            [
+              "2025-10",
+              "AI 搶產能"
+            ]
+          ],
+          "src": [
+            "engadget",
+            "slick21",
+            "camelDdr4",
+            "camelDdr5",
+            "toms375",
+            "ramIdx",
+            "ti450"
+          ],
+          "notes": [
+            "2023 年 DRAM 庫存過剩，32GB 套條跌到不到 $50。",
+            "2025 年底起，原廠把產能轉去做 AI 伺服器用的 HBM，桌機 DDR5 一年內漲了五倍以上。",
+            "同一時期 DDR4 也跟著漲到約 $198，舊平台沒有比較便宜。"
+          ],
+          "track": {
+            "query": "32GB（2x16GB）DDR5-6000 桌機記憶體套條在美國零售通路本月的最低售價（美元），可參考 Tom's Hardware RAM price index",
+            "note": "DDR5-6000 本月最低價"
+          }
+        },
+        "ssd": {
+          "name": "SSD 固態硬碟",
+          "spec": "1TB NVMe 固態硬碟最低價（各來源型號不同）",
+          "cur": "USD",
+          "unit": "美元・美國零售／二手均價",
+          "quality": "低",
+          "pts": [
+            {
+              "date": "2023-06",
+              "value": 50,
+              "note": "1TB NVMe 市場谷底"
+            },
+            {
+              "date": "2025-10",
+              "value": 90,
+              "note": "Samsung 990 Pro 1TB"
+            },
+            {
+              "date": "2026-10",
+              "value": 144,
+              "note": "Crucial P310 1TB"
+            },
+            {
+              "date": "2026-11",
+              "value": 128.32,
+              "note": "每 TB 價格指數"
+            }
+          ],
+          "events": [
+            [
+              "2025-10",
+              "AI 搶產能"
+            ]
+          ],
+          "src": [
+            "sdpCheap",
+            "sdpHist",
+            "tiSsd"
+          ],
+          "notes": [
+            "各來源追蹤的型號不同，數字只能看方向，不能逐點比較。",
+            "2023 年 NAND 供過於求，1TB 跌到約 $50。",
+            "2026 年 AI 資料中心大量採購，消費級 SSD 漲到約兩到三倍，年底開始持平。"
+          ],
+          "track": {
+            "query": "1TB NVMe PCIe 4.0 SSD 在美國零售通路本月的最低售價（美元）",
+            "note": "1TB NVMe 本月最低價"
+          }
+        },
+        "mb": {
+          "name": "主機板",
+          "noData": "主機板型號太多，沒有找到可靠的長期價格紀錄。"
+        },
+        "cooler": {
+          "name": "CPU 散熱器",
+          "noData": "散熱器沒有找到可靠的長期價格紀錄。"
+        },
+        "psu": {
+          "name": "電源供應器",
+          "noData": "電源供應器沒有找到可靠的長期價格紀錄。"
+        },
+        "case": {
+          "name": "機殼",
+          "noData": "機殼沒有找到可靠的長期價格紀錄。"
+        }
+      }
+    },
+    "mac": {
+      "label": "底殼拆開・MacBook 筆電",
+      "parts": {
+        "chip": {
+          "name": "M 系列晶片",
+          "spec": "晶片不單賣，以 13 吋 MacBook Air 入門款官網售價代表各世代",
+          "cur": "TWD",
+          "unit": "新台幣・Apple 台灣官網",
+          "quality": "高",
+          "pts": [
+            {
+              "date": "2020-11",
+              "value": 30900,
+              "note": "M1・8GB／256GB"
+            },
+            {
+              "date": "2022-07",
+              "value": 37900,
+              "note": "M2・8GB／256GB，新外型"
+            },
+            {
+              "date": "2024-03",
+              "value": 35900,
+              "note": "M3・8GB／256GB"
+            },
+            {
+              "date": "2025-03",
+              "value": 34900,
+              "note": "M4・入門改 16GB"
+            },
+            {
+              "date": "2026-03",
+              "value": 35900,
+              "note": "M5・16GB／512GB"
+            },
+            {
+              "date": "2026-06",
+              "value": 42900,
+              "note": "M5・官網調漲後"
+            }
+          ],
+          "events": [
+            [
+              "2020-11",
+              "M1"
+            ],
+            [
+              "2022-07",
+              "M2"
+            ],
+            [
+              "2024-03",
+              "M3"
+            ],
+            [
+              "2025-03",
+              "M4"
+            ],
+            [
+              "2026-03",
+              "M5"
+            ]
+          ],
+          "src": [
+            "insideM1",
+            "tbM2",
+            "yahooM4",
+            "tnM5",
+            "afHike",
+            "tnHike"
+          ],
+          "notes": [
+            "M2 換新外型，入門價一口氣漲 7,000 元。",
+            "M4 起入門款標配 16GB，售價反而比 M3 便宜 1,000 元。",
+            "2026 年 6 月 25 日 Apple 以記憶體與儲存成本上升為由，調漲台灣 Mac 售價，Air 入門款漲 7,000 元。"
+          ],
+          "track": {
+            "query": "Apple 台灣官網 (apple.com/tw) 13 吋 MacBook Air 入門款目前的建議售價（新台幣）",
+            "note": "13 吋 Air 入門款官網價"
+          }
+        },
+        "umem": {
+          "name": "統一記憶體",
+          "spec": "官網選配：記憶體升一級的加價",
+          "cur": "TWD",
+          "unit": "新台幣・Apple 台灣官網",
+          "quality": "低",
+          "pts": [
+            {
+              "date": "2026-03",
+              "value": 7000,
+              "note": "M5 Air 升一級"
+            }
+          ],
+          "src": [
+            "madM5",
+            "madHike"
+          ],
+          "notes": [
+            "記憶體和晶片封裝在一起，只能下單時選，之後無法自己加。",
+            "2026 年 6 月 Apple 已調漲記憶體選配價，但目前查到的報導沒有寫出確切金額，所以只放一筆。"
+          ],
+          "track": {
+            "query": "Apple 台灣官網 13 吋 MacBook Air 選配統一記憶體升一級目前的加價金額（新台幣）",
+            "note": "Air 記憶體升一級"
+          }
+        },
+        "mssd": {
+          "name": "SSD 儲存空間",
+          "spec": "官網選配：MacBook Air 儲存空間升一級的加價",
+          "cur": "TWD",
+          "unit": "新台幣・Apple 台灣官網",
+          "quality": "中",
+          "pts": [
+            {
+              "date": "2026-03",
+              "value": 7000,
+              "note": "M5 Air 升一級"
+            },
+            {
+              "date": "2026-06",
+              "value": 10500,
+              "note": "官網調漲後"
+            }
+          ],
+          "src": [
+            "madM5",
+            "madHike"
+          ],
+          "notes": [
+            "儲存晶片焊在主機板上，買了就不能升級。",
+            "2026 年 6 月調價後，升一級從 7,000 元漲到 10,500 元，漲幅 50%。"
+          ],
+          "track": {
+            "query": "Apple 台灣官網 13 吋 MacBook Air 選配儲存空間升一級（例如 512GB 升 1TB）目前的加價金額（新台幣）",
+            "note": "Air 儲存空間升一級"
+          }
+        },
+        "display": {
+          "name": "螢幕總成",
+          "noData": "Apple 台灣的螢幕維修費沒有公開歷年價目，目前查不到可靠來源。"
+        },
+        "battery": {
+          "name": "電池",
+          "noData": "Apple 台灣曾調漲過保電池服務費（MacBook Air 漲 1,400 元），但原始報導無法讀取，確切日期與金額還沒核對，先不放數字。"
+        },
+        "topcase": {
+          "name": "上蓋（含鍵盤）",
+          "noData": "上蓋維修費沒有公開歷年價目，目前查不到可靠來源。"
+        },
+        "charger": {
+          "name": "電源轉接器",
+          "noData": "電源轉接器的歷年售價還沒查到可靠來源。"
+        }
+      }
+    }
+  }
+}

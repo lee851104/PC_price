@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>零件行情儀</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 左邊是可點的機器剖面圖，右邊是該零件的價格走勢；窄螢幕時上下堆疊 */
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --ink:#18212b; --muted:#5d6b78; --line:#d3dae1;
+  --metal:#c9d1d9; --metal-2:#aeb8c2; --pcb:#2f5d50; --pcb-2:#3d7565; --chip:#26303a;
+  --accent:#e07a1f; --accent-soft:#fbe6d2; --up:#c2410c; --down:#0f766e; --grid:#e3e8ec;
+  --glass:rgba(150,180,210,.14);
+  --f-body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --panel:#19212a; --ink:#e7ecf1; --muted:#93a1ae; --line:#2c3743;
+  --metal:#3a4652; --metal-2:#4b5966; --pcb:#1f4a3e; --pcb-2:#2a6151; --chip:#0b0f13;
+  --accent:#f59a45; --accent-soft:#3b2a1a; --up:#fb923c; --down:#2dd4bf; --grid:#24303b;
+  --glass:rgba(120,160,200,.08); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11161c; --panel:#19212a; --ink:#e7ecf1; --muted:#93a1ae; --line:#2c3743;
+  --metal:#3a4652; --metal-2:#4b5966; --pcb:#1f4a3e; --pcb-2:#2a6151; --chip:#0b0f13;
+  --accent:#f59a45; --accent-soft:#3b2a1a; --up:#fb923c; --down:#2dd4bf; --grid:#24303b;
+  --glass:rgba(120,160,200,.08); color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-size:14px;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:900;margin:0;letter-spacing:.02em;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.tabs{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.tabs button{font:inherit;font-weight:700;border:0;background:none;color:var(--muted);padding:8px 18px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tabs button:focus-visible,.chips button:focus-visible,.range button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:22px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.stage-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.hint{font-size:.8rem;color:var(--muted)}
+svg.machine{width:100%;height:auto;display:block;max-width:100%}
+.part{cursor:pointer;outline:none}
+.part .hl{fill:transparent;stroke:transparent;stroke-width:2.5;transition:stroke .15s,fill .15s}
+.part:hover .hl,.part:focus-visible .hl{stroke:var(--accent);fill:rgba(224,122,31,.10)}
+.part.on .hl{stroke:var(--accent);fill:rgba(224,122,31,.18);stroke-dasharray:none}
+.part.on .tag rect{fill:var(--accent)} .part.on .tag text{fill:#fff}
+.tag rect{fill:var(--panel);stroke:var(--line)} .tag text{fill:var(--ink);font:600 11px var(--f-body)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chips button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:5px 10px;cursor:pointer}
+.chips button.on{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.detail h2{margin:0;font-size:1.35rem;font-weight:900;text-wrap:balance}
+.spec{color:var(--muted);margin:2px 0 14px;font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media (max-width:520px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{border-left:3px solid var(--line);padding:2px 0 2px 10px;min-width:0}
+.stat .k{font-size:.75rem;color:var(--muted);letter-spacing:.06em}
+.stat .v{font-family:var(--f-data);font-weight:600;font-size:1.15rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat.now{border-left-color:var(--accent)}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+.chart-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.range{display:inline-flex;gap:4px}
+.range button{font:600 .8rem var(--f-data);border:1px solid var(--line);background:none;color:var(--muted);border-radius:6px;padding:3px 9px;cursor:pointer}
+.range button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chart-box{position:relative}
+svg.chart{width:100%;height:auto;display:block;touch-action:pan-y}
+.chart .gl{stroke:var(--grid)} .chart .ax{fill:var(--muted);font:11px var(--f-data)}
+.chart .ln{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.chart .ar{fill:var(--accent);opacity:.12}
+.chart .ev line{stroke:var(--muted);stroke-dasharray:3 4;opacity:.6} .chart .ev text{fill:var(--muted);font:10.5px var(--f-body)}
+.chart .end{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.chart .cur line{stroke:var(--ink);opacity:.35} .chart .cur circle{fill:var(--panel);stroke:var(--accent);stroke-width:2.5}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:600 12px var(--f-data);padding:5px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-120%)}
+.notes{margin-top:14px;display:grid;gap:8px}
+.notes h3{margin:0;font-size:.8rem;letter-spacing:.1em;color:var(--muted)}
+.notes ul{margin:0;padding-left:1.2em;max-width:65ch}
+.notes li{margin:2px 0}
+.chips button.nd{color:var(--muted);border-style:dashed}
+.q{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;margin:-6px 0 12px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.q[data-q="高"]{color:var(--down);border-color:currentColor}
+.q[data-q="低"]{color:var(--up);border-color:currentColor}
+.nodata{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--muted)}
+.nodata strong{color:var(--ink);font-size:1.05rem}
+.nodata p{margin:6px 0 0;max-width:60ch}
+.chart .pt{fill:var(--panel);stroke:var(--accent);stroke-width:2}
+.tip{display:grid;gap:2px;white-space:normal;max-width:220px;text-align:left}
+.tip span{font:400 11.5px var(--f-body);opacity:.85}
+.tbl{margin-top:14px}
+.tbl summary{cursor:pointer;font-size:.85rem;font-weight:700;color:var(--muted)}
+.tbl-wrap{overflow-x:auto;margin-top:8px}
+.tbl table{border-collapse:collapse;width:100%;font-size:.85rem}
+.tbl th,.tbl td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--muted);font-weight:500}
+.tbl td:first-child,.tbl .num{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.src a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px;word-break:break-word}
+.src{font-size:.85rem}
+.disclaimer{font-size:.8rem;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="nodata" id="load-err" hidden>價格資料載入失敗，請重新整理頁面。</p>
+  <header>
+    <div>
+      <h1>零件行情儀</h1>
+      <p class="sub">點機器裡的零件，看它 2020 到 2026 年的真實價格紀錄與來源。</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="機種">
+      <button role="tab" id="tab-win" aria-selected="true" data-m="win">Windows 桌機</button>
+      <button role="tab" id="tab-mac" aria-selected="false" data-m="mac">MacBook</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="card" aria-label="機器剖面">
+      <div class="stage-head">
+        <span class="eyebrow" id="stage-label">側板拆開・桌上型主機</span>
+        <span class="hint">點零件或下方標籤・虛線標籤為資料不足</span>
+      </div>
+
+      <!-- Windows 桌機 -->
+      <svg class="machine" id="svg-win" viewBox="0 0 440 470" role="group" aria-label="Windows 桌機內部">
+        <rect x="20" y="14" width="400" height="442" rx="14" fill="var(--metal)" stroke="var(--metal-2)" stroke-width="2"/>
+        <rect x="34" y="28" width="372" height="414" rx="8" fill="var(--glass)" stroke="var(--metal-2)"/>
+        <!-- 機殼 (點外框) -->
+        <g class="part" data-id="case" tabindex="0" role="button" aria-label="機殼">
+          <rect class="hl" x="20" y="14" width="400" height="442" rx="14" fill="none"/>
+          <rect x="378" y="40" width="20" height="300" rx="4" fill="var(--metal-2)"/>
+          <circle cx="388" cy="60" r="5" fill="var(--chip)"/>
+          <g class="tag" transform="translate(338,350)"><rect width="56" height="20" rx="4"/><text x="28" y="14" text-anchor="middle">機殼</text></g>
+        </g>
+        <!-- 主機板 -->
+        <g class="part" data-id="mb" tabindex="0" role="button" aria-label="主機板">
+          <rect x="52" y="40" width="300" height="300" rx="4" fill="var(--pcb)"/>
+          <g fill="var(--pcb-2)"><rect x="60" y="300" width="80" height="30" rx="2"/><rect x="300" y="290" width="40" height="40" rx="2"/><rect x="60" y="50" width="18" height="120"/></g>
+          <rect class="hl" x="52" y="40" width="300" height="300" rx="4"/>
+          <g class="tag" transform="translate(62,306)"><rect width="66" height="20" rx="4"/><text x="33" y="14" text-anchor="middle">主機板</text></g>
+        </g>
+        <!-- CPU 散熱器 -->
+        <g class="part" data-id="cooler" tabindex="0" role="button" aria-label="CPU 散熱器">
+          <rect x="112" y="70" width="104" height="104" rx="8" fill="var(--metal-2)"/>
+          <circle cx="164" cy="122" r="42" fill="var(--chip)"/>
+          <g stroke="var(--metal)" stroke-width="5" stroke-linecap="round"><line x1="164" y1="88" x2="164" y2="156"/><line x1="130" y1="122" x2="198" y2="122"/><line x1="140" y1="98" x2="188" y2="146"/><line x1="188" y1="98" x2="140" y2="146"/></g>
+          <circle cx="164" cy="122" r="10" fill="var(--metal-2)"/>
+          <rect class="hl" x="112" y="70" width="104" height="104" rx="8"/>
+          <g class="tag" transform="translate(116,48)"><rect width="56" height="20" rx="4"/><text x="28" y="14" text-anchor="middle">散熱器</text></g>
+        </g>
+        <!-- CPU (散熱器下方，露出的插槽標示) -->
+        <g class="part" data-id="cpu" tabindex="0" role="button" aria-label="CPU 處理器">
+          <rect x="140" y="180" width="48" height="26" rx="3" fill="var(--chip)"/>
+          <rect x="146" y="185" width="36" height="16" rx="2" fill="var(--metal)"/>
+          <rect class="hl" x="136" y="176" width="56" height="34" rx="4"/>
+          <g class="tag" transform="translate(196,183)"><rect width="44" height="20" rx="4"/><text x="22" y="14" text-anchor="middle">CPU</text></g>
+        </g>
+        <!-- RAM -->
+        <g class="part" data-id="ram" tabindex="0" role="button" aria-label="記憶體">
+          <g fill="var(--chip)"><rect x="246" y="62" width="9" height="124" rx="2"/><rect x="261" y="62" width="9" height="124" rx="2"/><rect x="276" y="62" width="9" height="124" rx="2"/><rect x="291" y="62" width="9" height="124" rx="2"/></g>
+          <g fill="var(--accent)" opacity=".55"><rect x="246" y="62" width="9" height="8"/><rect x="261" y="62" width="9" height="8"/><rect x="276" y="62" width="9" height="8"/><rect x="291" y="62" width="9" height="8"/></g>
+          <rect class="hl" x="240" y="56" width="66" height="136" rx="4"/>
+          <g class="tag" transform="translate(306,100)"><rect width="56" height="20" rx="4"/><text x="28" y="14" text-anchor="middle">記憶體</text></g>
+        </g>
+        <!-- SSD -->
+        <g class="part" data-id="ssd" tabindex="0" role="button" aria-label="SSD 固態硬碟">
+          <rect x="96" y="214" width="120" height="16" rx="2" fill="var(--chip)"/>
+          <g fill="var(--metal-2)"><rect x="104" y="217" width="22" height="10"/><rect x="132" y="217" width="22" height="10"/><rect x="160" y="217" width="22" height="10"/></g>
+          <rect class="hl" x="92" y="210" width="128" height="24" rx="3"/>
+          <g class="tag" transform="translate(226,212)"><rect width="44" height="20" rx="4"/><text x="22" y="14" text-anchor="middle">SSD</text></g>
+        </g>
+        <!-- GPU -->
+        <g class="part" data-id="gpu" tabindex="0" role="button" aria-label="顯示卡">
+          <rect x="62" y="244" width="300" height="54" rx="6" fill="var(--chip)"/>
+          <rect x="62" y="244" width="300" height="6" fill="var(--accent)" opacity=".7"/>
+          <g fill="var(--metal-2)"><circle cx="140" cy="272" r="20"/><circle cx="232" cy="272" r="20"/><circle cx="318" cy="272" r="16"/></g>
+          <g fill="var(--chip)"><circle cx="140" cy="272" r="6"/><circle cx="232" cy="272" r="6"/><circle cx="318" cy="272" r="5"/></g>
+          <rect class="hl" x="58" y="240" width="308" height="62" rx="7"/>
+          <g class="tag" transform="translate(264,302)"><rect width="56" height="20" rx="4"/><text x="28" y="14" text-anchor="middle">顯示卡</text></g>
+        </g>
+        <!-- PSU -->
+        <g class="part" data-id="psu" tabindex="0" role="button" aria-label="電源供應器">
+          <rect x="40" y="356" width="360" height="78" rx="6" fill="var(--metal-2)"/>
+          <rect x="56" y="370" width="110" height="52" rx="4" fill="var(--chip)"/>
+          <g stroke="var(--metal-2)" stroke-width="2"><line x1="66" y1="382" x2="156" y2="382"/><line x1="66" y1="392" x2="156" y2="392"/><line x1="66" y1="402" x2="156" y2="402"/><line x1="66" y1="412" x2="156" y2="412"/></g>
+          <rect class="hl" x="40" y="356" width="360" height="78" rx="6"/>
+          <g class="tag" transform="translate(180,385)"><rect width="78" height="20" rx="4"/><text x="39" y="14" text-anchor="middle">電源供應器</text></g>
+        </g>
+      </svg>
+
+      <!-- MacBook -->
+      <svg class="machine" id="svg-mac" viewBox="0 0 520 470" role="group" aria-label="MacBook 內部" hidden>
+        <!-- 螢幕 -->
+        <g class="part" data-id="display" tabindex="0" role="button" aria-label="螢幕總成">
+          <rect x="70" y="12" width="380" height="150" rx="12" fill="var(--metal-2)"/>
+          <rect x="82" y="22" width="356" height="130" rx="5" fill="var(--chip)"/>
+          <rect x="242" y="22" width="36" height="8" rx="3" fill="var(--metal-2)"/>
+          <path d="M100 140 L200 40 L240 40 L140 140Z" fill="var(--metal)" opacity=".12"/>
+          <rect class="hl" x="66" y="8" width="388" height="158" rx="13"/>
+          <g class="tag" transform="translate(220,82)"><rect width="80" height="20" rx="4"/><text x="40" y="14" text-anchor="middle">螢幕總成</text></g>
+        </g>
+        <rect x="54" y="166" width="412" height="8" rx="3" fill="var(--metal-2)"/>
+        <!-- 底殼外框 = 上蓋鍵盤 -->
+        <g class="part" data-id="topcase" tabindex="0" role="button" aria-label="上蓋含鍵盤">
+          <rect x="40" y="178" width="440" height="272" rx="18" fill="var(--metal)" stroke="var(--metal-2)" stroke-width="2"/>
+          <rect class="hl" x="40" y="178" width="440" height="272" rx="18"/>
+          <g class="tag" transform="translate(46,424)"><rect width="104" height="20" rx="4"/><text x="52" y="14" text-anchor="middle">上蓋（含鍵盤）</text></g>
+        </g>
+        <!-- 喇叭 -->
+        <g fill="var(--metal-2)"><rect x="58" y="196" width="34" height="140" rx="6"/><rect x="428" y="196" width="34" height="140" rx="6"/></g>
+        <g fill="var(--chip)" opacity=".5">
+          <circle cx="75" cy="216" r="2"/><circle cx="75" cy="236" r="2"/><circle cx="75" cy="256" r="2"/><circle cx="75" cy="276" r="2"/><circle cx="75" cy="296" r="2"/><circle cx="75" cy="316" r="2"/>
+          <circle cx="445" cy="216" r="2"/><circle cx="445" cy="236" r="2"/><circle cx="445" cy="256" r="2"/><circle cx="445" cy="276" r="2"/><circle cx="445" cy="296" r="2"/><circle cx="445" cy="316" r="2"/>
+        </g>
+        <!-- 主機板 -->
+        <rect x="104" y="192" width="312" height="78" rx="6" fill="var(--pcb)"/>
+        <!-- SoC -->
+        <g class="part" data-id="chip" tabindex="0" role="button" aria-label="Apple 晶片">
+          <rect x="224" y="202" width="58" height="58" rx="5" fill="var(--chip)"/>
+          <rect x="236" y="214" width="34" height="34" rx="3" fill="var(--metal-2)"/>
+          <rect class="hl" x="220" y="198" width="66" height="66" rx="6"/>
+          <g class="tag" transform="translate(150,206)"><rect width="66" height="20" rx="4"/><text x="33" y="14" text-anchor="middle">M 系列晶片</text></g>
+        </g>
+        <!-- 統一記憶體 -->
+        <g class="part" data-id="umem" tabindex="0" role="button" aria-label="統一記憶體">
+          <rect x="290" y="206" width="20" height="22" rx="2" fill="var(--chip)"/>
+          <rect x="290" y="234" width="20" height="22" rx="2" fill="var(--chip)"/>
+          <rect class="hl" x="286" y="202" width="28" height="58" rx="3"/>
+          <g class="tag" transform="translate(318,206)"><rect width="78" height="20" rx="4"/><text x="39" y="14" text-anchor="middle">統一記憶體</text></g>
+        </g>
+        <!-- 儲存 -->
+        <g class="part" data-id="mssd" tabindex="0" role="button" aria-label="SSD 儲存空間">
+          <rect x="116" y="234" width="38" height="26" rx="2" fill="var(--chip)"/>
+          <rect x="160" y="234" width="38" height="26" rx="2" fill="var(--chip)"/>
+          <rect class="hl" x="112" y="230" width="90" height="34" rx="3"/>
+          <g class="tag" transform="translate(320,238)"><rect width="44" height="20" rx="4"/><text x="22" y="14" text-anchor="middle">SSD</text></g>
+        </g>
+        <line x1="364" y1="248" x2="202" y2="248" stroke="var(--line)" stroke-dasharray="2 3"/>
+        <!-- 電池 -->
+        <g class="part" data-id="battery" tabindex="0" role="button" aria-label="電池">
+          <g fill="var(--chip)">
+            <rect x="104" y="282" width="96" height="120" rx="6"/><rect x="212" y="282" width="96" height="120" rx="6"/><rect x="320" y="282" width="96" height="120" rx="6"/>
+          </g>
+          <g fill="var(--metal-2)" opacity=".5"><rect x="114" y="292" width="76" height="4"/><rect x="222" y="292" width="76" height="4"/><rect x="330" y="292" width="76" height="4"/></g>
+          <rect class="hl" x="100" y="278" width="320" height="128" rx="7"/>
+          <g class="tag" transform="translate(234,332)"><rect width="52" height="20" rx="4"/><text x="26" y="14" text-anchor="middle">電池</text></g>
+        </g>
+        <!-- 充電器 -->
+        <g class="part" data-id="charger" tabindex="0" role="button" aria-label="電源轉接器">
+          <path d="M466 300 C 492 300, 498 330, 498 360" fill="none" stroke="var(--metal-2)" stroke-width="4"/>
+          <rect x="478" y="360" width="38" height="46" rx="8" fill="var(--panel)" stroke="var(--metal-2)" stroke-width="2"/>
+          <rect class="hl" x="472" y="354" width="48" height="58" rx="9"/>
+          <g class="tag" transform="translate(452,416)"><rect width="66" height="20" rx="4"/><text x="33" y="14" text-anchor="middle">充電器</text></g>
+        </g>
+      </svg>
+
+      <div class="chips" id="chips"></div>
+    </section>
+
+    <section class="card detail" aria-live="polite">
+      <span class="eyebrow" id="d-cat">零件</span>
+      <h2 id="d-name">—</h2>
+      <p class="spec" id="d-spec"></p>
+      <span class="q" id="d-q" hidden></span>
+      <div id="no-data" class="nodata" hidden>
+        <strong>資料不足</strong>
+        <p id="nd-text"></p>
+      </div>
+      <div id="has-data">
+      <div class="stats">
+        <div class="stat now"><div class="k" id="s-now-k">最新</div><div class="v" id="s-now">—</div></div>
+        <div class="stat"><div class="k" id="s-yoy-k">一年變化</div><div class="v" id="s-yoy">—</div></div>
+        <div class="stat"><div class="k" id="s-lo-k">最低</div><div class="v" id="s-lo">—</div></div>
+        <div class="stat"><div class="k" id="s-hi-k">最高</div><div class="v" id="s-hi">—</div></div>
+      </div>
+      <div class="chart-top">
+        <span class="eyebrow" id="unit">價格走勢</span>
+        <div class="range" id="range">
+          <button data-r="0" class="on">全部</button><button data-r="3">3 年</button><button data-r="1">1 年</button>
+        </div>
+      </div>
+      <div class="chart-box" id="chart-box">
+        <svg class="chart" id="chart" viewBox="0 0 640 280" aria-label="價格走勢圖"></svg>
+        <div class="tip" id="tip" hidden></div>
+      </div>
+      <div class="notes">
+        <h3>為什麼這樣漲跌</h3>
+        <ul id="d-notes"></ul>
+      </div>
+      <details class="tbl">
+        <summary>全部資料點</summary>
+        <div class="tbl-wrap"><table><thead><tr><th>時間</th><th>價格</th><th>說明</th></tr></thead><tbody id="d-table"></tbody></table></div>
+      </details>
+      <div class="notes">
+        <h3>資料來源</h3>
+        <ul class="src" id="d-src"></ul>
+      </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="disclaimer">資料說明：每個點都是公開報導或比價網站上查得到的實際價格，最後查核日 <span id="checked">—</span>，每月 1 日由 GitHub Actions 自動查新價格。桌機零件用美國市場價格（美元），因為台灣通路沒有公開的長期價格紀錄，但漲跌方向和台灣大致相同。MacBook 用 Apple 台灣官網價格（新台幣）。點和點之間的線只是連起來方便看趨勢，不代表中間的實際價格。沒查到可靠來源的零件標示「資料不足」，不放估計值。</p>
+</div>
+<script>
+let SRC={},DATA={};
+fetch("data/prices.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(j=>{
+  for(const [k,v] of Object.entries(j.sources))SRC[k]=[v.title,v.url];
+  for(const [m,v] of Object.entries(j.machines)){DATA[m]={label:v.label,parts:{}};
+    for(const [id,p] of Object.entries(v.parts)){const o={...p};if(o.pts)o.pts=o.pts.map(x=>[x.date,x.value,x.note,x.source]);DATA[m].parts[id]=o}}
+  document.getElementById("checked").textContent=j.checked.replace(/-/g,"/");
+  boot();
+}).catch(e=>{document.getElementById("load-err").hidden=false;console.error(e)});
+function boot(){
+let machine="win",part="ram",range=0;
+const $=id=>document.getElementById(id);
+const fmt=(v,c)=>c==="TWD"?"NT$ "+Math.round(v).toLocaleString("en-US"):"US$ "+(v>=1000?Math.round(v).toLocaleString("en-US"):v.toLocaleString("en-US",{maximumFractionDigits:2}));
+const tnum=d=>{const [y,m]=d.split("-").map(Number);return y+(m-1)/12};
+try{const s=JSON.parse(localStorage.getItem("ppt")||"{}");if(DATA[s.m]&&DATA[s.m].parts[s.p]){machine=s.m;part=s.p}}catch(e){}
+function save(){try{localStorage.setItem("ppt",JSON.stringify({m:machine,p:part}))}catch(e){}}
+
+function setMachine(m,keepPart){
+  machine=m;
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
+  $("svg-win").hidden=m!=="win";$("svg-mac").hidden=m!=="mac";
+  $("stage-label").textContent=DATA[m].label;
+  const chips=$("chips");chips.innerHTML="";
+  for(const [id,p] of Object.entries(DATA[m].parts)){
+    const b=document.createElement("button");b.textContent=p.name;b.dataset.id=id;
+    if(p.noData)b.classList.add("nd");
+    b.onclick=()=>select(id);chips.appendChild(b);
+  }
+  if(!keepPart)part=m==="win"?"ram":"chip";
+  select(part);
+}
+function select(id){
+  part=id;save();
+  const svg=$(machine==="win"?"svg-win":"svg-mac");
+  svg.querySelectorAll(".part").forEach(g=>g.classList.toggle("on",g.dataset.id===id));
+  $("chips").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.id===id));
+  const p=DATA[machine].parts[id];
+  $("d-cat").textContent=machine==="win"?"WINDOWS 桌機零件":"MACBOOK 零件";
+  $("d-name").textContent=p.name;
+  const has=!p.noData;
+  $("has-data").hidden=!has;$("no-data").hidden=has;
+  if(!has){$("d-spec").textContent="";$("nd-text").textContent=p.noData;$("d-q").hidden=true;return}
+  $("d-spec").textContent=p.spec;
+  $("d-q").hidden=false;$("d-q").textContent="資料可信度："+p.quality;$("d-q").dataset.q=p.quality;
+  $("unit").textContent=p.unit;
+  $("d-notes").innerHTML=p.notes.map(n=>`<li>${n}</li>`).join("");
+  $("d-src").innerHTML=p.src.map(k=>`<li><a href="${SRC[k][1]}" target="_blank" rel="noopener">${SRC[k][0]}</a></li>`).join("");
+  draw();
+}
+function draw(){
+  const p=DATA[machine].parts[part];
+  const all=p.pts.map(([d,v,n,sk])=>({d,t:tnum(d),v,n,sk}));
+  const last=all[all.length-1];
+  const cut=range?last.t-range:-Infinity;
+  let pts=all.filter(a=>a.t>=cut-1e-6);
+  if(pts.length<2&&all.length>=2)pts=all.slice(-2);
+  // 數字摘要
+  $("s-now-k").textContent=`最新（${last.d.replace("-","/")}）`;
+  $("s-now").textContent=fmt(last.v,p.cur);
+  const ago=all.filter(a=>Math.abs(a.t-(last.t-1))<=4/12).sort((a,b)=>Math.abs(a.t-(last.t-1))-Math.abs(b.t-(last.t-1)))[0];
+  const first=all[0];
+  const e=$("s-yoy");
+  if(ago){const ch=(last.v-ago.v)/ago.v*100;$("s-yoy-k").textContent="一年變化";e.textContent=(ch>0?"+":"")+ch.toFixed(0)+"%";e.className="v "+(ch>0.5?"up":ch<-0.5?"down":"flat")}
+  else if(all.length>1){const ch=(last.v-first.v)/first.v*100;$("s-yoy-k").textContent=`比 ${first.d.slice(0,4)} 年`;e.textContent=(ch>0?"+":"")+ch.toFixed(0)+"%";e.className="v "+(ch>0.5?"up":ch<-0.5?"down":"flat")}
+  else{$("s-yoy-k").textContent="變化";e.textContent="—";e.className="v flat"}
+  const lo=all.reduce((a,b)=>b.v<a.v?b:a),hi=all.reduce((a,b)=>b.v>a.v?b:a);
+  $("s-lo").textContent=fmt(lo.v,p.cur);$("s-lo-k").textContent=`最低（${lo.d.replace("-","/")}）`;
+  $("s-hi").textContent=fmt(hi.v,p.cur);$("s-hi-k").textContent=`最高（${hi.d.replace("-","/")}）`;
+
+  const W=640,H=280,L=66,R=22,T=30,B=34;
+  const vs=pts.map(a=>a.v);let ymin=Math.min(...vs),ymax=Math.max(...vs);
+  if(ymax-ymin<ymax*.15){const m=(ymax+ymin)/2;ymin=m*.8;ymax=m*1.2}
+  const step=nice((ymax-ymin)/4);ymin=Math.max(0,Math.floor(ymin/step)*step);ymax=Math.ceil(ymax/step)*step;
+  let t0=pts[0].t,t1=pts[pts.length-1].t;if(t1-t0<.5){t0-=.25;t1+=.25}
+  const pad=(t1-t0)*.03;t0-=pad;t1+=pad;
+  const x=t=>L+(t-t0)/(t1-t0)*(W-L-R);
+  const y=v=>T+(1-(v-ymin)/(ymax-ymin))*(H-T-B);
+  const short=v=>p.cur==="TWD"?(v>=10000?(v/1000).toFixed(v%1000?1:0)+"k":v.toLocaleString("en-US")):"$"+(v>=1000?(v/1000).toFixed(v%1000?1:0)+"k":v);
+  let g="";
+  for(let v=ymin;v<=ymax+1e-6;v+=step)g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${short(v)}</text>`;
+  for(let yr=Math.ceil(t0);yr<=Math.floor(t1);yr++)g+=`<line class="gl" x1="${x(yr)}" x2="${x(yr)}" y1="${H-B}" y2="${H-B+4}"/><text class="ax" x="${x(yr)}" y="${H-12}" text-anchor="middle">${yr}</text>`;
+  (p.events||[]).map(([d,t])=>({t:tnum(d),label:t})).filter(ev=>ev.t>=t0&&ev.t<=t1).forEach((ev,n)=>{
+    const xx=x(ev.t),anchor=xx>W-90?"end":"start",dx=anchor==="end"?-4:4;
+    g+=`<g class="ev"><line x1="${xx}" x2="${xx}" y1="${T-6}" y2="${H-B}"/><text x="${xx+dx}" y="${T-12+(n%2)*13}" text-anchor="${anchor}">${ev.label}</text></g>`});
+  const xy=pts.map(a=>`${x(a.t).toFixed(1)},${y(a.v).toFixed(1)}`);
+  g+=`<path class="ar" d="M${x(pts[0].t)},${H-B} L${xy.join(" L")} L${x(last.t)},${H-B}Z"/>`;
+  g+=`<path class="ln" d="M${xy.join(" L")}"/>`;
+  pts.forEach((a,i)=>g+=`<circle class="${i===pts.length-1?"end":"pt"}" cx="${x(a.t)}" cy="${y(a.v)}" r="${i===pts.length-1?5.5:4}"/>`);
+  g+=`<g class="cur" id="cur" visibility="hidden"><circle r="7"/></g>`;
+  g+=`<rect id="hit" x="0" y="0" width="${W}" height="${H}" fill="transparent"/>`;
+  const svg=$("chart");svg.innerHTML=g;
+  const cur=svg.querySelector("#cur circle"),tip=$("tip");
+  function move(ev){
+    const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)*W/r.width;
+    let bi=0,bd=Infinity;pts.forEach((a,i)=>{const d=Math.abs(x(a.t)-px);if(d<bd){bd=d;bi=i}});
+    const a=pts[bi];
+    svg.querySelector("#cur").setAttribute("visibility","visible");cur.setAttribute("cx",x(a.t));cur.setAttribute("cy",y(a.v));
+    tip.hidden=false;tip.innerHTML=`<b>${a.d.replace("-","/")}・${fmt(a.v,p.cur)}</b><span>${a.n}</span>`;
+    tip.style.left=Math.min(Math.max(x(a.t)*r.width/W,100),r.width-100)+"px";tip.style.top=(y(a.v)*r.height/H)+"px";
+  }
+  const hit=svg.querySelector("#hit");
+  hit.addEventListener("pointermove",move);hit.addEventListener("pointerdown",move);
+  hit.addEventListener("pointerleave",()=>{svg.querySelector("#cur").setAttribute("visibility","hidden");tip.hidden=true});
+  // 資料表
+  $("d-table").innerHTML=all.slice().reverse().map(a=>`<tr><td>${a.d.replace("-","/")}</td><td class="num">${fmt(a.v,p.cur)}</td><td>${a.n}${a.sk&&SRC[a.sk]?` <a href="${SRC[a.sk][1]}" target="_blank" rel="noopener">來源</a>`:""}</td></tr>`).join("");
+}
+function nice(s){const p=Math.pow(10,Math.floor(Math.log10(s)));const f=s/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setMachine(b.dataset.m));
+document.querySelectorAll(".part").forEach(g=>{
+  g.addEventListener("click",ev=>{ev.stopPropagation();select(g.dataset.id)});
+  g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(g.dataset.id)}});
+});
+document.querySelectorAll("#range button").forEach(b=>b.onclick=()=>{range=+b.dataset.r;document.querySelectorAll("#range button").forEach(x=>x.classList.toggle("on",x===b));draw()});
+setMachine(machine,true);
+}
+</script>
+</body>
+</html>

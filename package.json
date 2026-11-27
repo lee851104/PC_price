@@ -1,0 +1,13 @@
+{
+  "name": "pc-price",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update-prices": "node scripts/update-prices.mjs",
+    "validate": "node scripts/validate-data.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
+    "zod": "^4.6.7"
+  }
+}
