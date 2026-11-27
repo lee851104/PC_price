@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -75,5 +75,12 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+      # deploy-pages 偶爾在 artifact 剛上傳完時找不到它，等一下再試一次
       - id: deployment
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
