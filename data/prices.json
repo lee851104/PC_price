@@ -124,6 +124,18 @@
     "madHike": {
       "title": "瘋先生：蘋果漲價漲幅對照表",
       "url": "https://mrmad.com.tw/2026-apple-price-hike-macbook-ipad"
+    },
+    "auto-chip-2026-11": {
+      "title": "購買 Mac - Apple（台灣）",
+      "url": "https://www.apple.com/tw/shop/buy-mac"
+    },
+    "auto-umem-2026-11": {
+      "title": "中國台灣 Apple 教育優惠價 | RestockOwl",
+      "url": "https://restockowl.com/zh-hant/tw/education"
+    },
+    "auto-mssd-2026-11": {
+      "title": "購買 MacBook Air，13 吋，M5 晶片，10 核心 CPU，10 核心 GPU，午夜色，16GB 記憶體，1TB 儲存裝置 - 商務 - Apple（台灣）",
+      "url": "https://www.apple.com/tw_smb_101387/shop/buy-mac/macbook-air/13-%E5%90%8B-%E5%8D%88%E5%A4%9C%E8%89%B2-m5-%E6%99%B6%E7%89%87-10-%E6%A0%B8%E5%BF%83-cpu-10-%E6%A0%B8%E5%BF%83-gpu-16gb-%E8%A8%98%E6%86%B6%E9%AB%94-1tb-%E5%84%B2%E5%AD%98%E8%A3%9D%E7%BD%AE"
     }
   },
   "machines": {
@@ -455,6 +467,12 @@
               "date": "2026-06",
               "value": 42900,
               "note": "M5・官網調漲後"
+            },
+            {
+              "date": "2026-11",
+              "value": 42900,
+              "note": "13 吋 Air 入門款官網價：13 吋 MacBook Air，M5 晶片，10 核心 CPU、8 核心 GPU，16GB 記憶體，512GB 儲存裝置",
+              "source": "auto-chip-2026-11"
             }
           ],
           "events": [
@@ -485,7 +503,8 @@
             "yahooM4",
             "tnM5",
             "afHike",
-            "tnHike"
+            "tnHike",
+            "auto-chip-2026-11"
           ],
           "notes": [
             "M2 換新外型，入門價一口氣漲 7,000 元。",
@@ -508,11 +527,18 @@
               "date": "2026-03",
               "value": 7000,
               "note": "M5 Air 升一級"
+            },
+            {
+              "date": "2026-11",
+              "value": 7000,
+              "note": "Air 記憶體升一級：Apple 台灣官網 13 吋 MacBook Air M5 統一記憶體 16GB → 24GB 升級加價",
+              "source": "auto-umem-2026-11"
             }
           ],
           "src": [
             "madM5",
-            "madHike"
+            "madHike",
+            "auto-umem-2026-11"
           ],
           "notes": [
             "記憶體和晶片封裝在一起，只能下單時選，之後無法自己加。",
@@ -539,11 +565,18 @@
               "date": "2026-06",
               "value": 10500,
               "note": "官網調漲後"
+            },
+            {
+              "date": "2026-11",
+              "value": 10500,
+              "note": "Air 儲存空間升一級：MacBook Air 13 吋 M5 16GB 儲存空間 512GB 升級至 1TB 加價",
+              "source": "auto-mssd-2026-11"
             }
           ],
           "src": [
             "madM5",
-            "madHike"
+            "madHike",
+            "auto-mssd-2026-11"
           ],
           "notes": [
             "儲存晶片焊在主機板上，買了就不能升級。",
